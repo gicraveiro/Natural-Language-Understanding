@@ -13,7 +13,7 @@ Read spaCy documentation on dependency parser to learn provided methods.
 
 Define functions to:
 
-    expract a path of dependency relations from the ROOT to a token
+    extract a path of dependency relations from the ROOT to a token
     extract subtree of a dependents given a token
     check if a given list of tokens (segment of a sentence) forms a subtree
     identify head of a span, given its tokens
@@ -42,17 +42,24 @@ def extract_path_root_token(sentence):
 # extract subtree of a dependents given a token
 def extract_subtree(sentence):
 
-    doc = parser(sentence)
+    doc = parser(sentence)  
+    #subtree_list = [[]] 
 
-    for sent in doc.sents:
-        for token in sent:
-            print(token.text,"subtree:")
-            for descendant in token.subtree:
-                print(descendant)
-            print(' ')
+    for token in doc:
+        #i = 0
+        #subtree_list.append()
+        #j = 0
+        print(token.text,"subtree:")
+        for descendant in token.subtree:
+            print(descendant)
+            #subtree_list[i].append(descendant)
+            #j = j + 1
+        #i = i + 1
+
             
+        print(' ')           
     print(' ')
-    return token.subtree
+    #print(subtree_list)
 
 # check if a given list of tokens (segment of a sentence) forms a subtree
 def check_tokens_form_subtree(sentence, segment):
@@ -91,10 +98,9 @@ def identify_head(sequence):
 def extract_constituents(sentence): 
 
     doc = parser(sentence)
-    span = doc[0:len(doc)]
-    constituents = set()
+    #constituents = set()
     subject, dobj, iobj = [],[],[]
-    for token in span:
+    for token in doc:        #span = doc[0:len(doc)] -- alternate way 
         print(token.text)
         if token.dep_ == "nsubj": 
             for descendant in token.subtree:
@@ -118,7 +124,7 @@ spacy_nlp = spacy.load('en_core_web_sm')
 
 example = 'Lola and Anna gave me a birthday cake'
 sequence = 'difficult tasks'
-segment = 'with a telescope'
+segment = 'a birthday cake'
 
 print("Function 1 - Extract path of dependency relations from root to token\n")
 extract_path_root_token(example)
