@@ -43,23 +43,19 @@ def extract_path_root_token(sentence):
 def extract_subtree(sentence):
 
     doc = parser(sentence)  
-    #subtree_list = [[]] 
+    subtree_list = []
 
     for token in doc:
-        #i = 0
-        #subtree_list.append()
-        #j = 0
         print(token.text,"subtree:")
+        token_subtree_list = []
         for descendant in token.subtree:
             print(descendant)
-            #subtree_list[i].append(descendant)
-            #j = j + 1
-        #i = i + 1
-
+            token_subtree_list.append(descendant.text)
+        subtree_list.append(token_subtree_list)
             
         print(' ')           
     print(' ')
-    #print(subtree_list)
+    print('List with all subtrees:\n',subtree_list,'\n\n')
 
 # check if a given list of tokens (segment of a sentence) forms a subtree
 def check_tokens_form_subtree(sentence, segment):
@@ -98,10 +94,9 @@ def identify_head(sequence):
 def extract_constituents(sentence): 
 
     doc = parser(sentence)
-    #constituents = set()
+
     subject, dobj, iobj = [],[],[]
     for token in doc:        #span = doc[0:len(doc)] -- alternate way 
-        print(token.text)
         if token.dep_ == "nsubj": 
             for descendant in token.subtree:
                 subject.append(descendant.text)
@@ -118,7 +113,13 @@ def extract_constituents(sentence):
     print("Direct object:", (' '.join(dobj) if dobj else 'None'))
     print("Indirect object: ", (' '.join(iobj) if iobj else 'None'))  
 
-    return None
+    list_lists = []
+    list_lists.append(subject)
+    list_lists.append(dobj)
+    list_lists.append(iobj)
+    print('\nList with all constituents:\n',list_lists)
+
+    return list_lists
 
 spacy_nlp = spacy.load('en_core_web_sm')
 
