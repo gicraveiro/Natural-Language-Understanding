@@ -9,11 +9,11 @@ Requirements to run code:
 
 -> spaCy installed
 
-To install spacy, run: 
+To install spacy, run (to run this command it is necessary to have pip3 installed): 
 
 pip3 install spacy
 
-(to run this command it is necessary to have pip3 installed)
+
 
 Instructions:
 
