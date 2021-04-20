@@ -4,7 +4,9 @@ Natural language processing exercises with python, focused on NLU. Assignments a
 Assignment 1 - Dependency Graph:
 
 Requirements to run code:
+
 -> an environment configured with python3
+
 -> spaCy installed
     pip3 install spacy
     (to run this command it is necessary to have pip3 installed)
