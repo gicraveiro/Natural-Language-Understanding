@@ -8,8 +8,12 @@ Requirements to run code:
 -> an environment configured with python3
 
 -> spaCy installed
-    pip3 install spacy
-    (to run this command it is necessary to have pip3 installed)
+
+To install spacy, run: 
+
+pip3 install spacy
+
+(to run this command it is necessary to have pip3 installed)
 
 Instructions:
 
