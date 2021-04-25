@@ -1,4 +1,4 @@
-# Assignment 2 - Named Entity Recognition and Dependency parsing
+# Assignment 1 - Dependency Graph:
 
 
 Requirements to run code:
@@ -30,4 +30,4 @@ git clone git@github.com:gicraveiro/Natural-Language-Understanding.git
 Still inside the folder in which you cloned the repository, run:
 
 
-python3 ____________ COMPLETE!
+python3 dependency_graph.py
