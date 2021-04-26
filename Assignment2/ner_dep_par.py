@@ -106,23 +106,18 @@ def group_noun_chunks(corpus):
     
 def reconstruct(corpus):
     i = 0
-    new_corpus = []
-    flag = False
-    for i in range (len(corpus)):
+    print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
+    while i < len(corpus):
         if(corpus[i].text == "-"):
-            #new_corpus[i-1] = 
-            token.text = corpus[i-1].text + corpus[i].text + corpus[i+1].text
-            
-            flag = True
-            print(new_corpus[i-1].text)
-        else:
-            if(flag == False): 
-                new_corpus.append(corpus[i])
-            flag = False
-    #for token in corpus:
-    #    if (token.txt == "-"):
+            with corpus.retokenize() as retokenizer:
+                retokenizer.merge(corpus[i-1:i+2])
+            print(corpus[i-1])
+            i -= 1
+        i += 1
 
-    #return reconstructed
+    #print(corpus)
+    #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
+    return corpus
     
 
 
@@ -156,7 +151,7 @@ for list in nk_list:
 #print(final)
 
 
-txt = "A sentence that actually makes sense in AL-AIN , United Arab Emirates 1996-12-06"
+txt = "AL-AIN , United Arab Emirates 1996-12-06"
 
 
 #for list in nk_list:
@@ -167,13 +162,14 @@ txt = "A sentence that actually makes sense in AL-AIN , United Arab Emirates 199
 
 test_txt = nlp(txt)
 #nlp_proc = nlp(final)
-
-#for t in nlp_proc:
-#    print([t.text, t.ent_iob_, t.ent_type_, t.whitespace_])
+#nlp_proc = nlp(data2)
+#for list in nlp_proc:
+#    for t in list:
+#        print([t.text, t.ent_iob_, t.ent_type_, t.whitespace_])
 
 print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in test_txt])
 
-#reconstruct(test_txt)
+reconstruct(test_txt)
 '''
 for sent in data:
     if (sent != None):
@@ -226,3 +222,18 @@ for sent in data:
 
 #hyps2 = [hmm_ner.tag(s) for s in data]
 #print(hyps2[0])
+
+
+'''
+Passo a passo
+
+1 - Leio os dados conll 2003 em formato conll com a função do conll.py CHECK
+2 - Converte pro formato que processa direito com spacy
+    - agregar cada uma das palavras/token em uma lista de sentenças? ou em uma grande lista de tokens?
+3 - Processar com spacy
+4 - Reconstruir o processo de tokenization, unindo os tokens com hífen
+5 - Adaptar os tags - usar whitespace_
+
+
+''' 
+
