@@ -103,20 +103,29 @@ def group_noun_chunks(corpus):
     #    print (sent)
     #print(sentences)
     return sentences
-    
+
+
+# Reconstruct tokens
+#   merging tokens that were separated by hifens 
 def reconstruct(corpus):
     i = 0
-    print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
+    #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
     while i < len(corpus):
         if(corpus[i].text == "-"):
             with corpus.retokenize() as retokenizer:
                 retokenizer.merge(corpus[i-1:i+2])
-            print(corpus[i-1])
-            i -= 1
-        i += 1
+            #print("RETOKENIZE",corpus[i-1:i+2],corpus[i-1],corpus[i],corpus[i+1])
+            
+            #i -= 1 # loop infinito
+        
+        else: 
+            i += 1
+        #print(corpus[i].text)
+
 
     #print(corpus)
     #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
+    #print(type(corpus))
     return corpus
     
 
@@ -142,44 +151,48 @@ newlist = []
 for list in nk_list:
     str_format = ' '.join(list)
     newlist.append(str_format) # LIST OF ALL SENTENCES IN STRING FORMAT
-#print(newlist)
+print(newlist)
 
-#final = ""
-#for str_format in newlist:
-#    final += str_format
-#final = ''.join(newlist)
-#print(final)
-
+final = ""
+for str_format in newlist:
+    final += str_format
+final = ' '.join(newlist)
+print(final)
 
 txt = "AL-AIN , United Arab Emirates 1996-12-06"
 
-
-#for list in nk_list:
-#    list = Doc(nlp.vocab, words=list)
-#    print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in list])
-#doc = Doc(nlp.vocab, words=nk_list)
-#print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in (list in nk_list)])
-
-test_txt = nlp(txt)
+#test_txt = nlp(txt)
 #nlp_proc = nlp(final)
-#nlp_proc = nlp(data2)
-#for list in nlp_proc:
-#    for t in list:
-#        print([t.text, t.ent_iob_, t.ent_type_, t.whitespace_])
 
-print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in test_txt])
+#for sent in newlist:
+#    test_txt = nlp(sent)
+#    print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in test_txt])
 
-reconstruct(test_txt)
-'''
-for sent in data:
-    if (sent != None):
-        if(sent[0] == "\n"):
-            print("\n\n\n\n")
-        else:
-            print(sent[0])
-            print(sent)
+doc = nlp(final)
+doc = reconstruct(doc)
+for token in doc:
+    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)])
+#for sent in newlist:
+#    doc = nlp(sent[0])
+#    reconstructed = reconstruct(doc)
+#    sent = reconstructed
+#    print(type(sent))
+    #print(sent)
+    #for t in list:
+    #    print([t.text, t.ent_iob_, t.ent_type_, t.whitespace_])
+#print("nl",type(newlist))
+#for item in newlist:
+#    print("Alo",type(item))
+#    for token in item:
+#        print("som",type(token))
+#        print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)])
 
-'''
+#reconstructed = reconstruct(test_txt)
+
+#for sent in reconstructed:
+#    test_txt = nlp(sent.text)
+#    print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in test_txt])
+
 # ALIGN OUTPUT TOKENIZATION TO CORRECT INPUT FORMAT OF THE EVALUATE FUNCTION
 #   RECONSTRUCT TOKENIZATION AND ADAPT TAGS - tip: use whitespace_ information
 
