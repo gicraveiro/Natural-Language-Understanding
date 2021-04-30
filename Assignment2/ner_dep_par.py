@@ -125,7 +125,7 @@ def print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc):
     for conll_token,token in zip(conll_data,spacy_doc):
         properties = conll_token.split()
         print(properties[0] + ' -> ' + token.text)
-        print(properties[-1] + ' -> ' + token.ent_iob_ +'-'+token.ent_type_+'\n')
+        print(properties[-1] + ' -> ' + token.ent_iob_ +'-'+token.ent_type_+'\n')    
 
 def get_hyps(doc):
     hyps = []
@@ -147,6 +147,20 @@ def get_refs(conll_trained_data):
     #print(refs)
     return refs    
 
+def print_possible_labels(conll_data):
+    # spacy labels
+    #print ('\n', nlp.get_pipe("parser").labels,'\n')
+    #print (nlp.get_pipe("tagger").labels,'\n')
+    print (nlp.get_pipe("ner").labels,'\n')
+
+    # conll 2003 labels
+    conll_labels = []   
+    for conll_token in conll_data:
+        properties = conll_token.split()
+        if(properties[-1] not in conll_labels):
+            conll_labels.append(properties[-1])
+    print(conll_labels,'\n')
+
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
@@ -161,6 +175,7 @@ spacy_doc = reconstruct_hifenated_words(spacy_doc) # addressing the hifen conver
 # 2nd step - adaptation to the proper format for evaluation 
 
 print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
+print_possible_labels(conll_data)
 
 # getting references for conll evaluation
 refs = get_refs(conll_data)
@@ -170,14 +185,9 @@ hyps = get_hyps(spacy_doc)
 #results = evaluate(refs, hyps)
 #print(results)
 
-# spacy labels
-#print ('\n', nlp.get_pipe("parser").labels,'\n')
-#print (nlp.get_pipe("tagger").labels,'\n')
-#print (nlp.get_pipe("ner").labels,'\n')
 
-# nltk labels are not possible to get apparently
-# the ones from default named entity classifier, nltk.ne_chunk are:
-# FACILITY, GPE, GSP, LOCATION, ORGANIZATION, PERSON
+
+
 
 
 #print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
