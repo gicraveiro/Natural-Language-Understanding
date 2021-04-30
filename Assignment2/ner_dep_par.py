@@ -98,8 +98,8 @@ def tokenized_back_to_string(data):
     return original_corpus_rebuilt
 
 # Reconstruct tokens
-#   merge tokens that were separated by hifens 
-def reconstruct_hifenated_words(corpus):
+#   merge tokens that were separated by hyphens 
+def reconstruct_hyphenated_words(corpus):
     i = 0
     #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
     while i < len(corpus):
@@ -127,13 +127,26 @@ def print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc):
         print(properties[0] + ' -> ' + token.text)
         print(properties[-1] + ' -> ' + token.ent_iob_ +'-'+token.ent_type_+'\n')    
 
+def print_processed_tokens_from_both_corpus_simultaneously(hyps,refs):
+    
+    for ref,hyp in zip(refs,hyps):
+        print(ref,hyp)
+
 def get_hyps(doc):
     hyps = []
     for token in spacy_doc:
+        ent_type = token.ent_type_
+        if(ent_type == 'PERSON'):
+            ent_type = 'PER'
+        elif(ent_type == 'O' or ent_type == 'LOC' or ent_type == 'ORG'):
+            pass # doesnt change it
+        else:
+            ent_type = 'MISC'
+    
         if(token.ent_iob_ == "O"):
             iob = "O"
         else: 
-            iob = (token.ent_iob_ +'-'+token.ent_type_)
+            iob = (token.ent_iob_ +'-'+ent_type)
         hyps.append((token.text,iob))
     #print(hyps)
     return hyps
@@ -171,24 +184,20 @@ conll_data = set(filter(None, conll_data)) # removes None values from dataset
 corpus = tokenized_back_to_string(conll_data)
 spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
 # 1st step - reconstruction of the tokenization
-spacy_doc = reconstruct_hifenated_words(spacy_doc) # addressing the hifen conversion issue
+spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conversion issue
 # 2nd step - adaptation to the proper format for evaluation 
-
-print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
-print_possible_labels(conll_data)
 
 # getting references for conll evaluation
 refs = get_refs(conll_data)
 # getting hypothesis for conll evaluation
 hyps = get_hyps(spacy_doc)
 
-#results = evaluate(refs, hyps)
-#print(results)
+#print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
+#print_possible_labels(conll_data)
+#print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
-
-
-
-
+results = evaluate(refs, hyps)
+print(results)
 
 #print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
 
