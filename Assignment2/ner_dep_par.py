@@ -44,15 +44,23 @@ from conll import *
 # 2 - group recognized named entities using noun_chunks method of spaCy
 # Analyze the groups in terms of most frequent combinations
 def entity_grouping(corpus):
+    list_of_groups = []
+    print("Entity grouping")
 
     for chunk in corpus.noun_chunks:
-        print("chunk "+chunk.text)
+        print(chunk.text)
+        chunk_ents = []
         for token in chunk:
-            print(token.ent_type_)
-    for ent in corpus.ents:
-        print("entity "+ent.text)
-
-    return None
+            #print(token.ent_type_ if token.ent_type_ != "" else "none")            
+            if (token.ent_type_ != ""):
+                chunk_ents.append(token.ent_type_)
+        
+        print(chunk_ents)
+        list_of_groups.append(chunk_ents)
+    #for ent in corpus.ents:
+    #    print("entity "+ent.text)
+    #print(list_of_groups)
+    return list_of_groups
 # 3 - extends the entity span to cover the full noun-compounds
 def extend_entity_span(span):
     return None
