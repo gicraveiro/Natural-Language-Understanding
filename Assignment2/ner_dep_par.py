@@ -18,44 +18,12 @@ Assigment is in the intersection of Named Entity Recognition and Dependency Pars
 
 
 '''
-
-# Evaluate spaCy NER on CoNLL 2003 data (provided)
-# report token-level performance (per class and total)
-# report CoNLL chunk-level performance (per class and total);
-def evaluateA():
-    return None
-# group recognized named entities using noun_chunks method of spaCy
-# Analyze the groups in terms of most frequent combinations
-def entity_grouping():
-    return None
-# extends the entity span to cover the full noun-compounds
-def extend_entity_span(span):
-    return None
+# IMPORTS
 
 import nltk
 import spacy
 import pandas
-from spacy.tokens import Doc
-from spacy.util import compile_infix_regex
-from spacy.lang.char_classes import ALPHA, ALPHA_LOWER, ALPHA_UPPER, CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
-
-#nlp = spacy.blank("en")
-nlp = spacy.load("en_core_web_sm")
-infixes = (
-        LIST_ELLIPSES
-        + LIST_ICONS
-        + [
-            r"(?<=[0-9])[+\-\*^](?=[0-9-])",
-            r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
-                al=ALPHA_LOWER, au=ALPHA_UPPER, q=CONCAT_QUOTES
-            ),
-            r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
-            #r"(?<=[{a}])(?:{h})(?=[{a}])".format(a=ALPHA, h=HYPHENS),
-            r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
-        ]
-    )
-infix_re = compile_infix_regex(infixes)
-nlp.tokenizer.infix_finditer = infix_re.finditer
+#from spacy.tokens import Doc
 
 # to import conll
 import os
@@ -64,22 +32,25 @@ sys.path.insert(0, os.path.abspath('../data/'))
 
 from conll import *
 
-#nltk.download('conll2002')
-#from nltk.corpus import conll2002
-#c2002 = spacy.load('conll2002')
+# FUNCTIONS
 
-#print(len(conll2002.tagged_sents()))
-#print(conll2002._chunk_types)
-#print(conll2002.sents('esp.train')[0])
-#print(conll2002.tagged_sents('esp.train')[0])
-#print(conll2002.chunked_sents('esp.train')[0])
-#print(conll2002.iob_sents('esp.train')[0])
+# Evaluate spaCy NER on CoNLL 2003 data (provided)
+# report token-level performance (per class and total)
+# report CoNLL chunk-level performance (per class and total);
 
-#f = open("data/train.txt", "r")
-#contents = f.read()
-#print(contents)
-#f.close()
 
+
+# 2 - group recognized named entities using noun_chunks method of spaCy
+# Analyze the groups in terms of most frequent combinations
+def entity_grouping():
+    return None
+# 3 - extends the entity span to cover the full noun-compounds
+def extend_entity_span(span):
+    return None
+
+# Useful functions
+
+# extracts token texts and return them in a format of a list of lists, each list containing all tokens of the sentence
 def group_noun_chunks(corpus):
     sentences = [[]]
     i = 0
@@ -104,10 +75,30 @@ def group_noun_chunks(corpus):
     #print(sentences)
     return sentences
 
+def tokenized_back_to_string(data):
+
+    list_of_lists_of_tokens = group_noun_chunks(data)  # one list containing many lists, that contain many strings, each one representing a token text
+    list_of_sentences = [] # one list containing many strings, each one representing a sentence
+    #print(list_of_lists_of_tokens)
+
+    #Group tokens belonging to the same sentence into one string in the list of sentences
+    for list in list_of_lists_of_tokens:
+        str_format_sentence = ' '.join(list)
+        list_of_sentences.append(str_format_sentence) 
+    #print(list_of_sentences)
+
+    # Groups the strings of all sentences into one single corpus string
+    original_corpus_rebuilt = ""
+    for str_format_sentence in list_of_sentences:
+        original_corpus_rebuilt += str_format_sentence
+    original_corpus_rebuilt = ' '.join(list_of_sentences)
+    #print(original_corpus_rebuilt)
+
+    return original_corpus_rebuilt
 
 # Reconstruct tokens
-#   merging tokens that were separated by hifens 
-def reconstruct(corpus):
+#   merge tokens that were separated by hifens 
+def reconstruct_hifenated_words(corpus):
     i = 0
     #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
     while i < len(corpus):
@@ -128,91 +119,22 @@ def reconstruct(corpus):
     #print(type(corpus))
     return corpus
     
+# MAIN
 
+nlp = spacy.load("en_core_web_sm")
+data = get_chunks("data/test.txt")
 
-data = read_corpus_conll("data/test.txt")
+corpus = tokenized_back_to_string(data)
+doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
+# 1st step - reconstruction of the tokenization
+doc = reconstruct_hifenated_words(doc) # addressing the hifen conversion issue
+# 2nd step - adaptation to the proper format for evaluation - tip: use whitespace_ information
 
-data2 = get_chunks("data/test.txt")
-
-print(data2)
-'''
-for sent in data2:
-    if (sent != None):
-        if(sent.split()[0] == "\n"):
-            print("\n\n\n\n")
-        else:
-            print(sent.split()[0])
-            print(sent)
-            #break
-'''
-nk_list = group_noun_chunks(data2) # HAS PROBLEMS
-newlist = []
-#print(nk_list)
-for list in nk_list:
-    str_format = ' '.join(list)
-    newlist.append(str_format) # LIST OF ALL SENTENCES IN STRING FORMAT
-print(newlist)
-
-final = ""
-for str_format in newlist:
-    final += str_format
-final = ' '.join(newlist)
-print(final)
-
-txt = "AL-AIN , United Arab Emirates 1996-12-06"
-
-#test_txt = nlp(txt)
-#nlp_proc = nlp(final)
-
-#for sent in newlist:
-#    test_txt = nlp(sent)
-#    print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in test_txt])
-
-doc = nlp(final)
-doc = reconstruct(doc)
 for token in doc:
     print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)])
-#for sent in newlist:
-#    doc = nlp(sent[0])
-#    reconstructed = reconstruct(doc)
-#    sent = reconstructed
-#    print(type(sent))
-    #print(sent)
-    #for t in list:
-    #    print([t.text, t.ent_iob_, t.ent_type_, t.whitespace_])
-#print("nl",type(newlist))
-#for item in newlist:
-#    print("Alo",type(item))
-#    for token in item:
-#        print("som",type(token))
-#        print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)])
-
-#reconstructed = reconstruct(test_txt)
-
-#for sent in reconstructed:
-#    test_txt = nlp(sent.text)
-#    print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in test_txt])
-
-# ALIGN OUTPUT TOKENIZATION TO CORRECT INPUT FORMAT OF THE EVALUATE FUNCTION
-#   RECONSTRUCT TOKENIZATION AND ADAPT TAGS - tip: use whitespace_ information
-
-# 1st step - reconstruction of the tokenization
-
-# 2nd step - adaptation to the proper format for evaluation
-
-
-
-
-
-
-
-#print(data)
 
 #evaluated_data = evaluate(data)
-
 #print(evaluated_data)
-
-#print(c2002)
 
 # getting references (note that it is testb this time)
 #refs = [[(text, iob) for text, pos, iob in sent] for sent in conll2002.iob_sents('esp.train')]
@@ -242,9 +164,9 @@ Passo a passo
 
 1 - Leio os dados conll 2003 em formato conll com a função do conll.py CHECK
 2 - Converte pro formato que processa direito com spacy
-    - agregar cada uma das palavras/token em uma lista de sentenças? ou em uma grande lista de tokens?
-3 - Processar com spacy
-4 - Reconstruir o processo de tokenization, unindo os tokens com hífen
+    - agregar cada uma das palavras/token em uma lista de sentenças? ou em uma grande lista de tokens? CHECK
+3 - Processar com spacy CHECK
+4 - Reconstruir o processo de tokenization, unindo os tokens com hífen CHECK
 5 - Adaptar os tags - usar whitespace_
 
 
