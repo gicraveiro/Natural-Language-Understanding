@@ -87,11 +87,24 @@ def entity_grouping(corpus):
     #            print(token.text, "==", used_ent)
 
 
+    classes = [] # name, frequency
+    index = -1
+    for list in list_of_groups:
+        index = -1
+        for item in classes:
+            if(list == item[0]):
+                index = 0
+            #    classes[classes.index(list)][1] += 1
+        if(index == -1):
+            classes.append([list,0])         
+
+    print("Frequency analysis of entity groups implementation in progress")
         #print("entity "+c_ent.text+" "+used_ent)
     #print(list_of_groups)
     return list_of_groups
 # 3 - extends the entity span to cover the full noun-compounds
-def extend_entity_span(span):
+def extend_entity_span(corpus):
+    print("Extended entity span is not implemented yet")
     return None
 
 # Useful functions
@@ -277,8 +290,13 @@ simple_results = simple_evaluation(refs,hyps)
 
 #results = evaluate(refs, hyps)
 #print(results)
+print("\nConlleval evaluation outputs a strange error so we're skipping it, but feel welcome to test it! Here are the parameters(refs and hyps):\n")
+print(refs,'\n')
+print(hyps,'\n')
 
 entity_grouping(spacy_doc)
+
+extend_entity_span(spacy_doc)
 
 # Reference code from class examples
 
