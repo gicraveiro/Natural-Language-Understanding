@@ -44,21 +44,50 @@ from conll import *
 # 2 - group recognized named entities using noun_chunks method of spaCy
 # Analyze the groups in terms of most frequent combinations
 def entity_grouping(corpus):
-    list_of_groups = []
     print("Entity grouping")
-
+    
+    list_of_groups = []
+    ents_used = []
+    counter = 0
     for chunk in corpus.noun_chunks:
         print(chunk.text)
         chunk_ents = []
-        for token in chunk:
-            #print(token.ent_type_ if token.ent_type_ != "" else "none")            
+        for token in chunk:        
             if (token.ent_type_ != ""):
                 chunk_ents.append(token.ent_type_)
+                ents_used.append(token.text)
+                
         
         print(chunk_ents)
         list_of_groups.append(chunk_ents)
+
+    #flag = "new"
     #for ent in corpus.ents:
-    #    print("entity "+ent.text)
+    #    for used in ents_used:
+    #        if (ent.text == used):
+    #            flag = "match"
+    #    if (flag != "match"):
+    #        list_of_groups.append([ent])
+    #        counter += 1
+    #        print("new ent ",ent)   
+    #    flag = "new"     
+    #print(len(ents_used))
+    #print(len(corpus.ents))
+    #print(counter)
+    #print(len(ents_used)+counter)
+    #print(len(corpus.ents)-(len(ents_used)+counter))
+    #c_ents = iter(corpus.ents)
+    #for c_ent,used_ent in zip(c_ents,ents_used):
+    #    for token in c_ent:
+    #        if(token.text != used_ent):
+    #            print(token.text, "!=", used_ent)
+    #            list_of_groups.append([token.ent_type_])
+    #            next(c_ents)
+    #        else:
+    #            print(token.text, "==", used_ent)
+
+
+        #print("entity "+c_ent.text+" "+used_ent)
     #print(list_of_groups)
     return list_of_groups
 # 3 - extends the entity span to cover the full noun-compounds
