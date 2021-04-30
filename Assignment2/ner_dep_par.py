@@ -174,12 +174,6 @@ def print_possible_labels(conll_data):
             conll_labels.append(properties[-1])
     print(conll_labels,'\n')
 
-#class ent_evaluation:
-#    def __init__(self, name, correct, incorrect): 
-#        self.name = name 
-#        self.correct = correct
-#        self.incorrect = incorrect
-
 def simple_evaluation(refs,hyps):
     correct = 0
     incorrect = 0
@@ -204,8 +198,11 @@ def simple_evaluation(refs,hyps):
     print("Simple Evaluation Accuracy")
     print("Total:", total_accuracy)
 
-    for ent_type in classes:
-        print("Accuracy of",ent_type[0], ": ", ent_type[1]/(ent_type[1]+ent_type[2]))
+    for ent_type in classes:                
+        if(ent_type[1] == 0 and ent_type[2] == 0):
+            print("Actually,",ent_type[0],"did not appear in the corpus")
+        else: 
+            print("Accuracy of",ent_type[0], ": ", (ent_type[1]/(ent_type[1]+ent_type[2])))
     return total_accuracy
 
 # MAIN
