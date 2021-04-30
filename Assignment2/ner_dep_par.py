@@ -114,7 +114,6 @@ def reconstruct_hifenated_words(corpus):
             i += 1
         #print(corpus[i].text)
 
-
     #print(corpus)
     #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
     #print(type(corpus))
@@ -130,6 +129,27 @@ def print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc):
             conll_token = next(it_conll)
         print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
 
+def get_hyps(doc):
+    hyps = []
+    for token in spacy_doc:
+        if(token.ent_iob_ == "O"):
+            iob = "O"
+        else: 
+            iob = (token.ent_iob_ +'-'+token.ent_type_)
+        hyps.append((token.text,iob))
+    #print(hyps)
+    return hyps
+
+def get_refs(conll_trained_data):
+    refs = []
+
+    for token in conll_trained_data:
+        if(token != None): 
+            properties = token.split()
+        refs.append((properties[0],properties[-1]))
+    #print(refs)
+    return refs    
+
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
@@ -143,20 +163,12 @@ spacy_doc = reconstruct_hifenated_words(spacy_doc) # addressing the hifen conver
 # 2nd step - adaptation to the proper format for evaluation 
 
 #print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
-hyps = []
-#i = 0
-for token in spacy_doc:
-    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
-    if(token.ent_iob_ == "O"):
-        iob = "O"
-    else: 
-        iob = (token.ent_iob_ +'-'+token.ent_type_)
-    #print(token.ent_iob_ +'-'+token.ent_type_)
-    print(iob)
-    hyps.append((token.text,iob))
-    #print(hyps[i])
-    #i += 1
-print(hyps)
+
+# getting references for conll evaluation
+refs = get_refs(conll_data)
+# getting hypothesis for conll evaluation
+hyps = get_hyps(spacy_doc)
+
 # spacy labels
 #print ('\n', nlp.get_pipe("parser").labels,'\n')
 #print (nlp.get_pipe("tagger").labels,'\n')
@@ -166,6 +178,8 @@ print(hyps)
 # the ones from default named entity classifier, nltk.ne_chunk are:
 # FACILITY, GPE, GSP, LOCATION, ORGANIZATION, PERSON
 
+
+#print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
 
 #evaluated_data = evaluate(data)
 #print(evaluated_data)
