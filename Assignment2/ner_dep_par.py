@@ -126,6 +126,7 @@ def print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc):
     
     for conll_token,token in zip(it_conll,spacy_doc):
         if(conll_token == None):
+            print("NONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
             conll_token = next(it_conll)
         print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
 
@@ -142,18 +143,25 @@ def get_hyps(doc):
 
 def get_refs(conll_trained_data):
     refs = []
-
+    print(type(conll_trained_data))
     for token in conll_trained_data:
         if(token != None): 
             properties = token.split()
-        refs.append((properties[0],properties[-1]))
+            refs.append((properties[0],properties[-1]))
     #print(refs)
+
+    for item in refs:
+        if (item == None): 
+            print('NONEEEEEEEEEEEEEEEEEEEEEEEEE')
+        print(item)
     return refs    
 
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
 conll_data = get_chunks("data/test.txt")
+
+conll_data = set(filter(None, conll_data))
 
 # Applying spacy named entity recognition to the trained data
 corpus = tokenized_back_to_string(conll_data)
@@ -162,12 +170,14 @@ spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
 spacy_doc = reconstruct_hifenated_words(spacy_doc) # addressing the hifen conversion issue
 # 2nd step - adaptation to the proper format for evaluation 
 
-#print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
+print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
 
 # getting references for conll evaluation
 refs = get_refs(conll_data)
 # getting hypothesis for conll evaluation
 hyps = get_hyps(spacy_doc)
+results = evaluate(refs, hyps)
+print(results)
 
 # spacy labels
 #print ('\n', nlp.get_pipe("parser").labels,'\n')
