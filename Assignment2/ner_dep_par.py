@@ -120,6 +120,16 @@ def reconstruct_hifenated_words(corpus):
     #print(type(corpus))
     return corpus
     
+# Printing tokens from both tokenizations for comparison reasons
+def print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc):
+    
+    it_conll = iter(conll_data)
+    
+    for conll_token,token in zip(it_conll,spacy_doc):
+        if(conll_token == None):
+            conll_token = next(it_conll)
+        print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
+
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
@@ -130,18 +140,23 @@ corpus = tokenized_back_to_string(conll_data)
 spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
 # 1st step - reconstruction of the tokenization
 spacy_doc = reconstruct_hifenated_words(spacy_doc) # addressing the hifen conversion issue
-# 2nd step - adaptation to the proper format for evaluation - tip: use whitespace_ information
-it_conll = iter(conll_data)
+# 2nd step - adaptation to the proper format for evaluation 
 
-# Printing tokens from both tokenizations for comparison reasons
-for conll_token,token in zip(it_conll,spacy_doc):
-    if(conll_token == None):
-        conll_token = next(it_conll)
-    print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
-    
-#for token in spacy_doc:
-#    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
-
+#print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
+hyps = []
+#i = 0
+for token in spacy_doc:
+    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
+    if(token.ent_iob_ == "O"):
+        iob = "O"
+    else: 
+        iob = (token.ent_iob_ +'-'+token.ent_type_)
+    #print(token.ent_iob_ +'-'+token.ent_type_)
+    print(iob)
+    hyps.append((token.text,iob))
+    #print(hyps[i])
+    #i += 1
+print(hyps)
 # spacy labels
 #print ('\n', nlp.get_pipe("parser").labels,'\n')
 #print (nlp.get_pipe("tagger").labels,'\n')
