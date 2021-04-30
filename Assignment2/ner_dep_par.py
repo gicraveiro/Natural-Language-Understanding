@@ -137,10 +137,7 @@ it_conll = iter(conll_data)
 for conll_token,token in zip(it_conll,spacy_doc):
     if(conll_token == None):
         conll_token = next(it_conll)
-    else:
-        print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
-        #conll_token_list = conll_token.split(' ',1)
-        #print (conll_token_list[0] + conll_token_list[1] + ' -> ' + token.text + ' ' + token.ent_type_ + ' ' + token.whitespace_ + ' !')    
+    print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
     
 #for token in spacy_doc:
 #    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
