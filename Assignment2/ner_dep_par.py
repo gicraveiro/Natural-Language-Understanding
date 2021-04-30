@@ -174,6 +174,19 @@ def print_possible_labels(conll_data):
             conll_labels.append(properties[-1])
     print(conll_labels,'\n')
 
+def simple_evaluation(refs,hyps):
+    correct = 0
+    incorrect = 0
+    for ref,hyp in zip(refs,hyps):  
+        if(ref[1] == hyp[1]):
+            correct += 1
+        else:
+            incorrect +=1
+    total_accuracy = correct/(correct+incorrect)
+    print("Simple Evaluation Accuracy")
+    print("Total:", total_accuracy)
+    return total_accuracy
+
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
@@ -196,13 +209,14 @@ hyps = get_hyps(spacy_doc)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
-results = evaluate(refs, hyps)
-print(results)
+simple_results = simple_evaluation(refs,hyps)
 
-#print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
+#results = evaluate(refs, hyps)
+#print(results)
 
-#evaluated_data = evaluate(data)
-#print(evaluated_data)
+
+
+# Reference code from class examples
 
 # getting references (note that it is testb this time)
 #refs = [[(text, iob) for text, pos, iob in sent] for sent in conll2002.iob_sents('esp.train')]
@@ -226,17 +240,4 @@ print(results)
 #hyps2 = [hmm_ner.tag(s) for s in data]
 #print(hyps2[0])
 
-
-'''
-Passo a passo
-
-1 - Leio os dados conll 2003 em formato conll com a função do conll.py CHECK
-2 - Converte pro formato que processa direito com spacy
-    - agregar cada uma das palavras/token em uma lista de sentenças? ou em uma grande lista de tokens? CHECK
-3 - Processar com spacy CHECK
-4 - Reconstruir o processo de tokenization, unindo os tokens com hífen CHECK
-5 - Adaptar os tags - usar whitespace_
-
-
-''' 
-
+#print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
