@@ -23,6 +23,7 @@ Assigment is in the intersection of Named Entity Recognition and Dependency Pars
 import nltk
 import spacy
 import pandas
+import itertools
 #from spacy.tokens import Doc
 
 # to import conll
@@ -122,16 +123,36 @@ def reconstruct_hifenated_words(corpus):
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
-data = get_chunks("data/test.txt")
+conll_data = get_chunks("data/test.txt")
 
-corpus = tokenized_back_to_string(data)
-doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
+# Applying spacy named entity recognition to the trained data
+corpus = tokenized_back_to_string(conll_data)
+spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
 # 1st step - reconstruction of the tokenization
-doc = reconstruct_hifenated_words(doc) # addressing the hifen conversion issue
+spacy_doc = reconstruct_hifenated_words(spacy_doc) # addressing the hifen conversion issue
 # 2nd step - adaptation to the proper format for evaluation - tip: use whitespace_ information
 
-for token in doc:
-    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)])
+for conll_token,token in zip(conll_data,spacy_doc):
+    if(conll_token != None):
+        print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
+        #conll_token_list = conll_token.split(' ',1)
+        #print (conll_token_list[0] + conll_token_list[1] + ' -> ' + token.text + ' ' + token.ent_type_ + ' ' + token.whitespace_ + ' !')
+    
+    else:
+        print( ' ' + sent.text + ' !')
+    
+#for token in spacy_doc:
+#    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
+
+# spacy labels
+#print ('\n', nlp.get_pipe("parser").labels,'\n')
+#print (nlp.get_pipe("tagger").labels,'\n')
+#print (nlp.get_pipe("ner").labels,'\n')
+
+# nltk labels are not possible to get apparently
+# the ones from default named entity classifier, nltk.ne_chunk are:
+# FACILITY, GPE, GSP, LOCATION, ORGANIZATION, PERSON
+
 
 #evaluated_data = evaluate(data)
 #print(evaluated_data)
