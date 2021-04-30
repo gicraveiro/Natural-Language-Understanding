@@ -103,7 +103,7 @@ def reconstruct_hifenated_words(corpus):
     i = 0
     #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
     while i < len(corpus):
-        if(corpus[i].text == "-"):
+        if(corpus[i].text == "-" and corpus[i].whitespace_ == ""):
             with corpus.retokenize() as retokenizer:
                 retokenizer.merge(corpus[i-1:i+2])
             #print("RETOKENIZE",corpus[i-1:i+2],corpus[i-1],corpus[i],corpus[i+1])
@@ -131,15 +131,16 @@ spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
 # 1st step - reconstruction of the tokenization
 spacy_doc = reconstruct_hifenated_words(spacy_doc) # addressing the hifen conversion issue
 # 2nd step - adaptation to the proper format for evaluation - tip: use whitespace_ information
+it_conll = iter(conll_data)
 
-for conll_token,token in zip(conll_data,spacy_doc):
-    if(conll_token != None):
+# Printing tokens from both tokenizations for comparison reasons
+for conll_token,token in zip(it_conll,spacy_doc):
+    if(conll_token == None):
+        conll_token = next(it_conll)
+    else:
         print(conll_token.split(' ',1)[0] + ' -> ' + token.text)
         #conll_token_list = conll_token.split(' ',1)
-        #print (conll_token_list[0] + conll_token_list[1] + ' -> ' + token.text + ' ' + token.ent_type_ + ' ' + token.whitespace_ + ' !')
-    
-    else:
-        print( ' ' + sent.text + ' !')
+        #print (conll_token_list[0] + conll_token_list[1] + ' -> ' + token.text + ' ' + token.ent_type_ + ' ' + token.whitespace_ + ' !')    
     
 #for token in spacy_doc:
 #    print([(token.text, token.ent_iob_, token.ent_type_, token.whitespace_)]) # text, beginning or end of sentence, entity type, if there's a whitespace after or not
