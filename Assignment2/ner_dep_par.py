@@ -174,17 +174,38 @@ def print_possible_labels(conll_data):
             conll_labels.append(properties[-1])
     print(conll_labels,'\n')
 
+#class ent_evaluation:
+#    def __init__(self, name, correct, incorrect): 
+#        self.name = name 
+#        self.correct = correct
+#        self.incorrect = incorrect
+
 def simple_evaluation(refs,hyps):
     correct = 0
     incorrect = 0
-    for ref,hyp in zip(refs,hyps):  
+    classes = []
+    index = -1
+    for ref,hyp in zip(refs,hyps): 
+        index = -1
+        for item in classes:
+            if(ref[1] == item[0]):
+                index = classes.index(item)
+        if(index == -1):
+            classes.append([ref[1],0,0])  
+        
         if(ref[1] == hyp[1]):
             correct += 1
+            classes[index][1] += 1
         else:
             incorrect +=1
+            classes[index][2] += 1
+
     total_accuracy = correct/(correct+incorrect)
     print("Simple Evaluation Accuracy")
     print("Total:", total_accuracy)
+
+    for ent_type in classes:
+        print("Accuracy of",ent_type[0], ": ", ent_type[1]/(ent_type[1]+ent_type[2]))
     return total_accuracy
 
 # MAIN
