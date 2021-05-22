@@ -11,7 +11,9 @@ def stats():
 
 def evaluate(ref, hyp, otag='O'):
     # evaluation for NLTK
+    #print(ref)
     aligned = align_hyp(ref, hyp)
+    #print(aligned)
     return conlleval(aligned, otag=otag)
 
 
@@ -46,8 +48,9 @@ def conlleval(data, otag='O'):
 
         for token in sent:
 
-            hyp_iob, hyp = parse_iob(token[-1])
-            ref_iob, ref = parse_iob(token[-2])
+            hyp_iob, hyp = parse_iob(token[-1]) # None 
+            ref_iob, ref = parse_iob(token[-2]) # None
+            #print(token, sent)
 
             ref_e = is_eoc(ref, ref_iob, prev_ref, prev_ref_iob, otag)
             hyp_e = is_eoc(hyp, hyp_iob, prev_hyp, prev_hyp_iob, otag)

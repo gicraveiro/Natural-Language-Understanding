@@ -7,6 +7,8 @@ Unfortunately, I have a busy schedule between classes, internship and decent hea
 On that note,
 a simple evaluation was successfully implemented for the first part, total and per token
 However, the conlleval evaluation still outputs a strange error, despite its parameters (references and hypothesis), who seem fine
+Strange error source identified!!! The parameters are not built correctly... they were supposed to be in the format of a list of lists, the outer list has many sentences, the inner list has all tokens of the sentence with the 2 parameters needed
+
 
 The entity grouping was also majorly implemented but the entities that don't belong to noun chunks are not present yet
 There is also still an issue with the frequency analysis part, my guess is that I spent so many neurons this afternoon that they can no longer help me finish this relatively simple frequency count in time

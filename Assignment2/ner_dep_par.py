@@ -210,12 +210,14 @@ def get_hyps(doc):
     return hyps
 
 def get_refs(conll_trained_data):
+    print(conll_trained_data)
     refs = []
-    for token in conll_trained_data:
-        if(token != None): 
-            properties = token.split()
-            refs.append((properties[0],properties[-1]))
-    #print(refs)
+    refs = [[(text, iob) for text, pos, iob in sent] for sent in conll_trained_data]
+#    for token in conll_trained_data:
+#        if(token != None): 
+#            properties = token.split()
+#            refs.append((properties[0],properties[-1]))
+    print(refs)
     return refs    
 
 def print_possible_labels(conll_data):
@@ -281,6 +283,7 @@ spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conv
 
 # getting references for conll evaluation
 refs = get_refs(conll_data)
+print(refs[0])
 # getting hypothesis for conll evaluation
 hyps = get_hyps(spacy_doc)
 
@@ -288,7 +291,7 @@ hyps = get_hyps(spacy_doc)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
-simple_results = simple_evaluation(refs,hyps)
+#simple_results = simple_evaluation(refs,hyps)
 
 results = evaluate(refs, hyps)
 print(results)
@@ -305,6 +308,8 @@ print(results)
 # getting references (note that it is testb this time)
 #refs = [[(text, iob) for text, pos, iob in sent] for sent in conll2002.iob_sents('esp.train')]
 #print(refs[0])
+
+
 
 #import nltk.tag.hmm as hmm
 #trn_sents = [[(text, iob) for text, pos, iob in sent] for sent in conll2002.iob_sents('esp.train')]
