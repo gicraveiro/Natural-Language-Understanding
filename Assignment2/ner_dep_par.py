@@ -116,18 +116,18 @@ def group_noun_chunks(corpus):
     
     for tokenized in corpus:
         if ( tokenized != None):
-            aux = tokenized.split()
+            aux = tokenized.split() # transforms the string of the tokenized item into a list of strings ( each string is one component of the trained token)
             #print(aux)
-            if (len(aux) >= 3 and aux[2].startswith("B-")):
-                if (len(sentences) == 1 and len(sentences[0]) == 0):
-                    i = 0
+            if (len(aux) >= 3 and aux[2].startswith("B-")): # identifies the beginning of a new phrase
+                if (len(sentences) == 1 and len(sentences[0]) == 0): # identifies if it is the first token from the first sentence that will be added to the list (initial token)
+                    i = 0 # first sentence of the list position
                 else:
-                    i = i + 1
-                    sentences.append([])
+                    i = i + 1 # indicates the position of the next sentence in the list
+                    sentences.append([]) # creates the list for the coming sentence
                     #print(sentences[i-1])
                     #print("NEWLIST")
                     #print(aux[0],aux[2])
-            sentences[i].append(aux[0])
+            sentences[i].append(aux[0]) # adds only the token text to the correct sentence in the list of sentences
 
     #for sent in sentences:   
     #    print (sent)
@@ -147,9 +147,11 @@ def tokenized_back_to_string(data):
     #print(list_of_sentences)
 
     # Groups the strings of all sentences into one single corpus string
-    original_corpus_rebuilt = ""
-    for str_format_sentence in list_of_sentences:
-        original_corpus_rebuilt += str_format_sentence
+
+    #original_corpus_rebuilt = ""
+    #for str_format_sentence in list_of_sentences:
+    #    original_corpus_rebuilt += str_format_sentence  # would group all string but not separate them with spaces so let's cancel this approach
+        #print(original_corpus_rebuilt);
     original_corpus_rebuilt = ' '.join(list_of_sentences)
     #print(original_corpus_rebuilt)
 
@@ -161,13 +163,11 @@ def reconstruct_hyphenated_words(corpus):
     i = 0
     #print([(t.text, t.ent_iob_, t.ent_type_, t.whitespace_) for t in corpus])
     while i < len(corpus):
-        if(corpus[i].text == "-" and corpus[i].whitespace_ == ""):
+        if(corpus[i].text == "-" and corpus[i].whitespace_ == ""): # identify hyphen ("-" inside a word)
             with corpus.retokenize() as retokenizer:
-                retokenizer.merge(corpus[i-1:i+2])
-            #print("RETOKENIZE",corpus[i-1:i+2],corpus[i-1],corpus[i],corpus[i+1])
-            
-            #i -= 1 # loop infinito
-        
+                retokenizer.merge(corpus[i-1:i+2]) # merge the first part of the word, the hyphen and the second part of the word
+            #print("RETOKENIZE",corpus[i-1:i+2],corpus[i-1],corpus[i],corpus[i+1])            
+            #i -= 1 # loop infinito       
         else: 
             i += 1
         #print(corpus[i].text)
@@ -271,7 +271,9 @@ conll_data = get_chunks("data/test.txt")
 conll_data = set(filter(None, conll_data)) # removes None values from dataset
 
 # Applying spacy named entity recognition to the trained data
-corpus = tokenized_back_to_string(conll_data)
+
+corpus = tokenized_back_to_string(conll_data) # takes the trained data as input and outputs the original corpus (not trained)
+#print(corpus);
 spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
 # 1st step - reconstruction of the tokenization
 spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conversion issue
@@ -288,15 +290,15 @@ hyps = get_hyps(spacy_doc)
 
 simple_results = simple_evaluation(refs,hyps)
 
-#results = evaluate(refs, hyps)
-#print(results)
-print("\nConlleval evaluation outputs a strange error so we're skipping it, but feel welcome to test it! Here are the parameters(refs and hyps):\n")
-print(refs,'\n')
-print(hyps,'\n')
+results = evaluate(refs, hyps)
+print(results)
+#print("\nConlleval evaluation outputs a strange error so we're skipping it, but feel welcome to test it! Here are the parameters(refs and hyps):\n")
+#print(refs,'\n')
+#print(hyps,'\n')
 
-entity_grouping(spacy_doc)
+#entity_grouping(spacy_doc)
 
-extend_entity_span(spacy_doc)
+#extend_entity_span(spacy_doc)
 
 # Reference code from class examples
 
