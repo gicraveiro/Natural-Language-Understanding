@@ -20,6 +20,7 @@ Assigment is in the intersection of Named Entity Recognition and Dependency Pars
 '''
 # IMPORTS
 
+import conll
 import nltk
 import spacy
 import pandas
@@ -192,32 +193,48 @@ def print_processed_tokens_from_both_corpus_simultaneously(hyps,refs):
 
 def get_hyps(doc):
     hyps = []
-    for token in spacy_doc:
-        ent_type = token.ent_type_
-        if(ent_type == 'PERSON'):
-            ent_type = 'PER'
-        elif(ent_type == 'O' or ent_type == 'LOC' or ent_type == 'ORG'):
-            pass # doesnt change it
-        else:
-            ent_type = 'MISC'
-    
-        if(token.ent_iob_ == "O"):
-            iob = "O"
-        else: 
-            iob = (token.ent_iob_ +'-'+ent_type)
-        hyps.append((token.text,iob))
+    i = 0
+    for sent in spacy_doc.sents:
+        #print(sent)
+        hyps.append([])
+        for token in sent:
+            ent_type = token.ent_type_
+            if(ent_type == 'PERSON'):
+                ent_type = 'PER'
+            elif(ent_type == 'O' or ent_type == 'LOC' or ent_type == 'ORG'):
+                pass # doesnt change it
+            else:
+                ent_type = 'MISC'
+        
+            if(token.ent_iob_ == "O"):
+                iob = "O"
+            else: 
+                iob = (token.ent_iob_ +'-'+ent_type)
+            hyps[i].append((token.text,iob))
+        
+        i = i + 1
     #print(hyps)
     return hyps
 
 def get_refs(conll_trained_data):
-    print(conll_trained_data)
+    #print(conll_trained_data)
     refs = []
-    refs = [[(text, iob) for text, pos, iob in sent] for sent in conll_trained_data]
-#    for token in conll_trained_data:
-#        if(token != None): 
-#            properties = token.split()
-#            refs.append((properties[0],properties[-1]))
-    print(refs)
+    i = 0
+
+    for sent in conll_trained_data:
+        #print(sent)
+        refs.append([])
+        #refs = [[(text, iob) for text, pos, iob in sent] for sent in conll_trained_data]
+        for token in sent:
+            str = ''.join(token)
+            #print(str)
+            if(str != None): 
+                properties = str.split()
+                refs[i].append((properties[0],properties[-1]))
+                
+        #print(refs[i])
+        i = i + 1        
+    #print(refs)
     return refs    
 
 def print_possible_labels(conll_data):
@@ -269,6 +286,7 @@ def simple_evaluation(refs,hyps):
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
+conll_data_sents_list_format = read_corpus_conll("data/test.txt")
 conll_data = get_chunks("data/test.txt")
 conll_data = set(filter(None, conll_data)) # removes None values from dataset
 
@@ -282,10 +300,13 @@ spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conv
 # 2nd step - adaptation to the proper format for evaluation 
 
 # getting references for conll evaluation
-refs = get_refs(conll_data)
-print(refs[0])
+refs = get_refs(conll_data_sents_list_format)
+print(refs)
+#print(refs[1])
 # getting hypothesis for conll evaluation
 hyps = get_hyps(spacy_doc)
+print(hyps)
+#print(hyps[1])
 
 #print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
 #print_possible_labels(conll_data)
