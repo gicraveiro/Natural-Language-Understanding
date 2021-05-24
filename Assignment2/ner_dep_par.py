@@ -110,6 +110,23 @@ def extend_entity_span(corpus):
 
 # Useful functions
 
+def extract_tokens(list_of_tokenized_corpus):
+    sentences = []
+    i = 0
+
+    for sent in list_of_tokenized_corpus:
+        sentences.append([])
+        for tokenized in sent:
+            str_format_token = ''.join(tokenized)
+            #print(str_format_token)
+            aux = str_format_token.split() # transforms the string of the tokenized item into a list of strings ( each string is one component of the trained token)
+            sentences[i].append(aux[0])
+        #print(sentences[i])
+        i = i + 1   
+    #print(sentences)
+    return sentences
+
+
 # extracts token texts and return them in a format of a list of lists, each list containing all tokens of the sentence
 def group_noun_chunks(corpus):
     sentences = [[]]
@@ -132,12 +149,14 @@ def group_noun_chunks(corpus):
 
     #for sent in sentences:   
     #    print (sent)
-    #print(sentences)
+    print(sentences)
     return sentences
 
-def tokenized_back_to_string(data):
+def tokenized_back_to_string(list_of_tokenized_corpus):
 
-    list_of_lists_of_tokens = group_noun_chunks(data)  # one list containing many lists, that contain many strings, each one representing a token text
+    #print(list_of_tokenized_corpus)
+    list_of_lists_of_tokens = extract_tokens(list_of_tokenized_corpus)
+    #list_of_lists_of_tokens = group_noun_chunks(data)  # one list containing many lists, that contain many strings, each one representing a token text
     list_of_sentences = [] # one list containing many strings, each one representing a sentence
     #print(list_of_lists_of_tokens)
 
@@ -180,16 +199,25 @@ def reconstruct_hyphenated_words(corpus):
     
 # Printing tokens from both tokenizations for comparison reasons
 def print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc):
-    
-    for conll_token,token in zip(conll_data,spacy_doc):
-        properties = conll_token.split()
-        print(properties[0] + ' -> ' + token.text)
-        print(properties[-1] + ' -> ' + token.ent_iob_ +'-'+token.ent_type_+'\n')    
+    #print(conll_data)
+    #print(spacy_doc)
+    for conll_sentence, sent in zip(conll_data,spacy_doc.sents):
+        for conll_token,token in zip(conll_sentence,sent):
+            
+            properties_aux = conll_token[0] # "transforms" tuple format to string format
+            #print(properties_aux, token)
+            properties = properties_aux.split()
+            #print(properties)
+            #print(properties[0])
+            print(properties[0],' -> ',token.text)
+            print(properties[-1],' -> ',token.ent_iob_ +'-'+token.ent_type_+'\n')   
+            pass
 
 def print_processed_tokens_from_both_corpus_simultaneously(hyps,refs):
     
     for ref,hyp in zip(refs,hyps):
-        print(ref,hyp)
+        for token_ref,token_hyp in zip(ref,hyp):
+            print(token_ref,token_hyp)
 
 def get_hyps(doc):
     hyps = []
@@ -289,10 +317,12 @@ nlp = spacy.load("en_core_web_sm")
 conll_data_sents_list_format = read_corpus_conll("data/test.txt")
 conll_data = get_chunks("data/test.txt")
 conll_data = set(filter(None, conll_data)) # removes None values from dataset
+#print(conll_data_sents_list_format)
 
 # Applying spacy named entity recognition to the trained data
 
-corpus = tokenized_back_to_string(conll_data) # takes the trained data as input and outputs the original corpus (not trained)
+#corpus = tokenized_back_to_string(conll_data) # takes the trained data as input and outputs the original corpus (not trained)
+corpus = tokenized_back_to_string(conll_data_sents_list_format)
 #print(corpus);
 spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
 # 1st step - reconstruction of the tokenization
@@ -301,21 +331,24 @@ spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conv
 
 # getting references for conll evaluation
 refs = get_refs(conll_data_sents_list_format)
-print(refs)
+#print(refs)
 #print(refs[1])
 # getting hypothesis for conll evaluation
 hyps = get_hyps(spacy_doc)
-print(hyps)
+#print('\n\n\n')
+#print(hyps)
 #print(hyps[1])
 
 #print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
+print_tokens_from_both_corpus_simultaneously(conll_data_sents_list_format,spacy_doc)
+#print_tokens_from_both_corpus_simultaneously(conll_data,conll_data_sents_list_format)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
 #simple_results = simple_evaluation(refs,hyps)
 
-results = evaluate(refs, hyps)
-print(results)
+#results = evaluate(refs, hyps)
+#print(results)
 #print("\nConlleval evaluation outputs a strange error so we're skipping it, but feel welcome to test it! Here are the parameters(refs and hyps):\n")
 #print(refs,'\n')
 #print(hyps,'\n')
