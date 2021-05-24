@@ -226,14 +226,16 @@ def print_processed_tokens_from_both_corpus_simultaneously(hyps,refs):
         for token_ref,token_hyp in zip(ref,hyp):
             print(token_ref,token_hyp)
 
-def get_hyps(doc):
+def get_hyps(conll_trained_data, spacy_doc):
     hyps = []
     i = 0
-    for sent in spacy_doc.sents:
+    j = 0
+    for sent in conll_trained_data:
+    #for sent in spacy_doc.sents:
         #print(sent)
         hyps.append([])
         for token in sent:
-            ent_type = token.ent_type_
+            ent_type = spacy_doc[j].ent_type_
             if(ent_type == 'PERSON'):
                 ent_type = 'PER'
             elif(ent_type == 'O' or ent_type == 'LOC' or ent_type == 'ORG'):
@@ -241,13 +243,14 @@ def get_hyps(doc):
             else:
                 ent_type = 'MISC'
         
-            if(token.ent_iob_ == "O"):
+            if(spacy_doc[j].ent_iob_ == "O"):
                 iob = "O"
             else: 
-                iob = (token.ent_iob_ +'-'+ent_type)
-            hyps[i].append((token.text,iob))
-        
+                iob = (spacy_doc[j].ent_iob_ +'-'+ent_type)
+            hyps[i].append((spacy_doc[j].text,iob))
+            j = j + 1
         i = i + 1
+        #j = 0
     #print(hyps)
     return hyps
 
@@ -342,19 +345,22 @@ reconstruct_spacy_tokenization(conll_data_sents_list_format, spacy_doc)
 # getting references for conll evaluation
 refs = get_refs(conll_data_sents_list_format)
 #print(refs)
-print(refs[1])
 # getting hypothesis for conll evaluation
-hyps = get_hyps(spacy_doc)
+hyps = get_hyps(conll_data_sents_list_format, spacy_doc)
 #print('\n\n\n')
 #print(hyps)
-print(hyps[1])
+
 
 #print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
-print_tokens_from_both_corpus_simultaneously(conll_data_sents_list_format,spacy_doc)
+#print_tokens_from_both_corpus_simultaneously(conll_data_sents_list_format,spacy_doc)
 #print_tokens_from_both_corpus_simultaneously(conll_data,conll_data_sents_list_format)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
+#print(refs[1])
+#print(hyps[1])
+#print(refs[-1])
+#print(hyps[-1])
 #simple_results = simple_evaluation(refs,hyps)
 
 #results = evaluate(refs, hyps)
