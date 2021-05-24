@@ -199,19 +199,26 @@ def reconstruct_hyphenated_words(corpus):
     
 # Printing tokens from both tokenizations for comparison reasons
 def print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc):
-    #print(conll_data)
-    #print(spacy_doc)
-    for conll_sentence, sent in zip(conll_data,spacy_doc.sents):
-        for conll_token,token in zip(conll_sentence,sent):
-            
+    i = 0
+    for conll_sentence in conll_data:
+        for conll_token in conll_sentence:       
             properties_aux = conll_token[0] # "transforms" tuple format to string format
-            #print(properties_aux, token)
             properties = properties_aux.split()
-            #print(properties)
-            #print(properties[0])
-            print(properties[0],' -> ',token.text)
-            print(properties[-1],' -> ',token.ent_iob_ +'-'+token.ent_type_+'\n')   
-            pass
+            print(properties[0],' -> ',spacy_doc[i].text)
+            print(properties[-1],' -> ',spacy_doc[i].ent_iob_ +'-'+spacy_doc[i].ent_type_+'\n')  
+            i += 1
+        if(properties[0] != spacy_doc[i-1].text): break
+
+def reconstruct_spacy_tokenization(conll_data,spacy_doc):
+    i = 0
+    for conll_sentence in conll_data:
+        for conll_token in conll_sentence:           
+            properties_aux = conll_token[0] # "transforms" tuple format to string format
+            properties = properties_aux.split()
+            while (properties[0] != spacy_doc[i].text):
+                with spacy_doc.retokenize() as retokenizer:
+                    retokenizer.merge(spacy_doc[i:i+2])
+            i += 1
 
 def print_processed_tokens_from_both_corpus_simultaneously(hyps,refs):
     
@@ -323,21 +330,24 @@ conll_data = set(filter(None, conll_data)) # removes None values from dataset
 
 #corpus = tokenized_back_to_string(conll_data) # takes the trained data as input and outputs the original corpus (not trained)
 corpus = tokenized_back_to_string(conll_data_sents_list_format)
-#print(corpus);
+#print(corpus[0:100]);
 spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
+#print(spacy_doc[0:100])
 # 1st step - reconstruction of the tokenization
-spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conversion issue
+reconstruct_spacy_tokenization(conll_data_sents_list_format, spacy_doc)
+#spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conversion issue
 # 2nd step - adaptation to the proper format for evaluation 
-
+#print(corpus[0:500]);
+#print(spacy_doc[0:500])
 # getting references for conll evaluation
 refs = get_refs(conll_data_sents_list_format)
 #print(refs)
-#print(refs[1])
+print(refs[1])
 # getting hypothesis for conll evaluation
 hyps = get_hyps(spacy_doc)
 #print('\n\n\n')
 #print(hyps)
-#print(hyps[1])
+print(hyps[1])
 
 #print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
 print_tokens_from_both_corpus_simultaneously(conll_data_sents_list_format,spacy_doc)
