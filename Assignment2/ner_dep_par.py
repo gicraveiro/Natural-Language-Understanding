@@ -347,9 +347,7 @@ refs = get_refs(conll_data_sents_list_format)
 #print(refs)
 # getting hypothesis for conll evaluation
 hyps = get_hyps(conll_data_sents_list_format, spacy_doc)
-#print('\n\n\n')
 #print(hyps)
-
 
 #print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
 #print_tokens_from_both_corpus_simultaneously(conll_data_sents_list_format,spacy_doc)
@@ -357,14 +355,10 @@ hyps = get_hyps(conll_data_sents_list_format, spacy_doc)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
-#print(refs[1])
-#print(hyps[1])
-#print(refs[-1])
-#print(hyps[-1])
 #simple_results = simple_evaluation(refs,hyps)
 
-#results = evaluate(refs, hyps)
-#print(results)
+results = evaluate(refs, hyps)
+print(results)
 #print("\nConlleval evaluation outputs a strange error so we're skipping it, but feel welcome to test it! Here are the parameters(refs and hyps):\n")
 #print(refs,'\n')
 #print(hyps,'\n')
