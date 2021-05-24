@@ -325,33 +325,26 @@ def simple_evaluation(refs,hyps):
 
 nlp = spacy.load("en_core_web_sm")
 conll_data_sents_list_format = read_corpus_conll("data/test.txt")
-conll_data = get_chunks("data/test.txt")
-conll_data = set(filter(None, conll_data)) # removes None values from dataset
-#print(conll_data_sents_list_format)
+#conll_data = get_chunks("data/test.txt")
+#conll_data = set(filter(None, conll_data)) # removes None values from dataset
 
 # Applying spacy named entity recognition to the trained data
 
-#corpus = tokenized_back_to_string(conll_data) # takes the trained data as input and outputs the original corpus (not trained)
-corpus = tokenized_back_to_string(conll_data_sents_list_format)
-#print(corpus[0:100]);
+corpus = tokenized_back_to_string(conll_data_sents_list_format) # takes the trained data as input and outputs the original corpus (not trained)
+
 spacy_doc = nlp(corpus) # tokenize original reconstructed corpus but using spacy
-#print(spacy_doc[0:100])
+
 # 1st step - reconstruction of the tokenization
-reconstruct_spacy_tokenization(conll_data_sents_list_format, spacy_doc)
-#spacy_doc = reconstruct_hyphenated_words(spacy_doc) # addressing the hyphen conversion issue
+reconstruct_spacy_tokenization(conll_data_sents_list_format, spacy_doc)  # addressing all present conversion issues (known ones are "-" and ".")
+
 # 2nd step - adaptation to the proper format for evaluation 
-#print(corpus[0:500]);
-#print(spacy_doc[0:500])
+
 # getting references for conll evaluation
 refs = get_refs(conll_data_sents_list_format)
-#print(refs)
 # getting hypothesis for conll evaluation
 hyps = get_hyps(conll_data_sents_list_format, spacy_doc)
-#print(hyps)
 
-#print_tokens_from_both_corpus_simultaneously(conll_data,spacy_doc)
 #print_tokens_from_both_corpus_simultaneously(conll_data_sents_list_format,spacy_doc)
-#print_tokens_from_both_corpus_simultaneously(conll_data,conll_data_sents_list_format)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
@@ -359,9 +352,6 @@ hyps = get_hyps(conll_data_sents_list_format, spacy_doc)
 
 results = evaluate(refs, hyps)
 print(results)
-#print("\nConlleval evaluation outputs a strange error so we're skipping it, but feel welcome to test it! Here are the parameters(refs and hyps):\n")
-#print(refs,'\n')
-#print(hyps,'\n')
 
 #entity_grouping(spacy_doc)
 
