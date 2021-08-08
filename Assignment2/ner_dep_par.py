@@ -25,6 +25,7 @@ import nltk
 import spacy
 import pandas
 import itertools
+import pprint
 #from spacy.tokens import Doc
 
 # to import conll
@@ -33,6 +34,8 @@ import sys
 sys.path.insert(0, os.path.abspath('../data/'))
 
 from conll import *
+from sklearn.metrics import classification_report
+from sklearn.preprocessing import MultiLabelBinarizer
 
 # FUNCTIONS
 
@@ -149,7 +152,7 @@ def group_noun_chunks(corpus):
 
     #for sent in sentences:   
     #    print (sent)
-    print(sentences)
+    #print(sentences)
     return sentences
 
 def tokenized_back_to_string(list_of_tokenized_corpus):
@@ -321,6 +324,52 @@ def simple_evaluation(refs,hyps):
             print("Accuracy of",ent_type[0], ": ", (ent_type[1]/(ent_type[1]+ent_type[2])))
     return total_accuracy
 
+def get_refs_vector_simple_evaluation(conll_trained_data):
+    simple_refs = []
+    #i = 0
+
+    for sent in conll_trained_data:
+        #print(sent)
+        for token in sent:
+            str = ''.join(token)
+            #print(str)
+            if(str != None): 
+                properties = str.split()
+                simple_refs.append(properties[-1])
+                
+        #print(simple_refs[i])
+        #i = i + 1        
+    #print(simple_refs)
+    return simple_refs    
+
+def get_hyps_vector_simple_evaluation(conll_trained_data):
+    simple_hyps = []
+    i = 0
+    j = 0
+
+    for sent in conll_trained_data:
+        #print(sent)
+        for token in sent:
+            ent_type = spacy_doc[j].ent_type_
+            if(ent_type == 'PERSON'):
+                ent_type = 'PER'
+            elif(ent_type == 'O' or ent_type == 'LOC' or ent_type == 'ORG'):
+                pass # doesnt change it
+            else:
+                ent_type = 'MISC'
+        
+            if(spacy_doc[j].ent_iob_ == "O"):
+                iob = "O"
+            else: 
+                iob = (spacy_doc[j].ent_iob_ +'-'+ent_type)
+            simple_hyps.append(iob)
+            j = j + 1
+        i = i + 1
+     
+    #print(simple_hyps)
+    return simple_hyps    
+
+
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
@@ -348,14 +397,30 @@ hyps = get_hyps(conll_data_sents_list_format, spacy_doc)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
+#print("Simple evaluation, but now intended one also")
+print("Simple evaluation using scikit-learn classification report")
 #simple_results = simple_evaluation(refs,hyps)
 
+#refs_aux = MultiLabelBinarizer().fit_transform(refs)
+#hyps_aux = MultiLabelBinarizer().fit_transform(hyps)
+simple_refs = get_refs_vector_simple_evaluation(conll_data_sents_list_format)
+simple_hyps = get_hyps_vector_simple_evaluation(conll_data_sents_list_format)
+#print(refs)
+#print(hyps)
+#print(refs_aux)
+#print(hyps_aux)
+report = classification_report(simple_refs, simple_hyps)#/*, target_names=data.target_names)
+print(report)
+print("CONLL chunk-level performance using conll.py's evaluation function")
 results = evaluate(refs, hyps)
-print(results)
+pprint.pprint(results,width=1)
+#print(list(results))
+#print(list(dict.fromkeys(results)))
+
 
 #entity_grouping(spacy_doc)
 
-#extend_entity_span(spacy_doc)
+extend_entity_span(spacy_doc)
 
 # Reference code from class examples
 
