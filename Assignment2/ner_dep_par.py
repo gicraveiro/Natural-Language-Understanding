@@ -49,7 +49,47 @@ from sklearn.preprocessing import MultiLabelBinarizer
 # Analyze the groups in terms of most frequent combinations
 def entity_grouping(corpus):
     print("Entity grouping")
+
+    nlp.add_pipe("merge_noun_chunks")
+    spacy_nk_merged_doc = nlp(corpus)
+
+    list_of_ents = []
+    for ent in spacy_nk_merged_doc.ents:
+        list_of_ents.append(ent)
+   #print(list_of_ents)
+
+    list_of_chunks = []
+    entities = []
+    for span in list_of_ents:
+        entities = []
+        #print(span)
+        for token in span:
+            entities.append(token.ent_type_)
+            #print(token.text, token.ent_type_)
+        #print(entities)
+        list_of_chunks.append(entities[:]) # appends a copy of the list
+    #print(list_of_chunks)
+
+    print("Frequency analysis of entity groups implementation in progress")
+
+    freq_list = {}
+    for chunk in list_of_chunks:
+        #print(chunk)
+        name = []
+        for item in chunk:
+            name.append(item)
+            #print(item)
+        dict_key = tuple(name)
+        #print(name)
+        if(dict_key in freq_list):
+            freq_list[dict_key] +=1
+        else:
+            freq_list.__setitem__(dict_key,1)
+
+    pprint.pprint(freq_list, width=1)
     
+
+'''
     list_of_groups = []
     ents_used = []
     counter = 0
@@ -90,7 +130,6 @@ def entity_grouping(corpus):
     #        else:
     #            print(token.text, "==", used_ent)
 
-
     classes = [] # name, frequency
     index = -1
     for list in list_of_groups:
@@ -110,6 +149,7 @@ def entity_grouping(corpus):
 def extend_entity_span(corpus):
     print("Extended entity span is not implemented yet")
     return None
+'''
 
 # Useful functions
 
@@ -292,6 +332,8 @@ def print_possible_labels(conll_data):
             conll_labels.append(properties[-1])
     print(conll_labels,'\n')
 
+# Unused function - coded before I could correctly understand the task at hand
+# evaluates performance of prediction according to number of correct predictions divided by the sum of correct and incorrect predictions
 def simple_evaluation(refs,hyps):
     correct = 0
     incorrect = 0
@@ -369,7 +411,6 @@ def get_hyps_vector_simple_evaluation(conll_trained_data):
     #print(simple_hyps)
     return simple_hyps    
 
-
 # MAIN
 
 nlp = spacy.load("en_core_web_sm")
@@ -388,39 +429,29 @@ reconstruct_spacy_tokenization(conll_data_sents_list_format, spacy_doc)  # addre
 
 # 2nd step - adaptation to the proper format for evaluation 
 
-# getting references for conll evaluation
+#getting references and hypothesis for simple evaluation
+simple_refs = get_refs_vector_simple_evaluation(conll_data_sents_list_format)
+simple_hyps = get_hyps_vector_simple_evaluation(conll_data_sents_list_format)
+# getting references and hypothesis for conll evaluation
 refs = get_refs(conll_data_sents_list_format)
-# getting hypothesis for conll evaluation
 hyps = get_hyps(conll_data_sents_list_format, spacy_doc)
 
 #print_tokens_from_both_corpus_simultaneously(conll_data_sents_list_format,spacy_doc)
 #print_possible_labels(conll_data)
 #print_processed_tokens_from_both_corpus_simultaneously(hyps,refs)
 
-#print("Simple evaluation, but now intended one also")
 print("Simple evaluation using scikit-learn classification report")
-#simple_results = simple_evaluation(refs,hyps)
-
-#refs_aux = MultiLabelBinarizer().fit_transform(refs)
-#hyps_aux = MultiLabelBinarizer().fit_transform(hyps)
-simple_refs = get_refs_vector_simple_evaluation(conll_data_sents_list_format)
-simple_hyps = get_hyps_vector_simple_evaluation(conll_data_sents_list_format)
-#print(refs)
-#print(hyps)
-#print(refs_aux)
-#print(hyps_aux)
+#simple_results = simple_evaluation(refs,hyps) # OLD VERSION
 report = classification_report(simple_refs, simple_hyps)#/*, target_names=data.target_names)
 print(report)
+
 print("CONLL chunk-level performance using conll.py's evaluation function")
 results = evaluate(refs, hyps)
 pprint.pprint(results,width=1)
-#print(list(results))
-#print(list(dict.fromkeys(results)))
 
+entity_grouping(corpus)#spacy_doc)
 
-#entity_grouping(spacy_doc)
-
-extend_entity_span(spacy_doc)
+#extend_entity_span(spacy_doc)
 
 # Reference code from class examples
 
