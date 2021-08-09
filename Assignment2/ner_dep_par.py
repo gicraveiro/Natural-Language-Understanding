@@ -70,7 +70,7 @@ def entity_grouping(corpus):
         list_of_chunks.append(entities[:]) # appends a copy of the list
     #print(list_of_chunks)
 
-    print("Frequency analysis of entity groups implementation in progress")
+    print("Frequency analysis of entity groups") # "implementation in progress"
 
     freq_list = {}
     for chunk in list_of_chunks:
