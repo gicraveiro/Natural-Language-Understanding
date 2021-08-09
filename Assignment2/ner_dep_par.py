@@ -145,11 +145,43 @@ def entity_grouping(corpus):
         #print("entity "+c_ent.text+" "+used_ent)
     #print(list_of_groups)
     return list_of_groups
-# 3 - extends the entity span to cover the full noun-compounds
-def extend_entity_span(corpus):
-    print("Extended entity span is not implemented yet")
-    return None
 '''
+# 3 - extends the entity span to cover the full noun-compounds
+def extend_entity_span(corpus,spacy_doc):
+    print("Extended entity span implementation in progress")
+
+    extended_compound_doc = nlp(corpus)
+    i = 0
+    for sentence in spacy_doc.ents:
+        print(sentence)
+#        for token in sentence:           
+        #properties_aux = token[0] # "transforms" tuple format to string format
+        #properties = properties_aux.split()
+        #print(properties)
+        #print(sentence, sentence.dep_)
+      
+        # i < len(extended_compound_doc) and 
+        # extended_compound_doc[i]
+        for token in sentence:
+            if(token.dep_ == "compound"):
+                print(token, token.dep_)
+                for child in token.children:
+                    print("child", child, child.dep_, child.i)
+                
+                print("head", token.head, token.head.dep_, token.head.i)
+                #print(token, token.dep_)
+                #print(spacy_doc[i])
+                #print(extended_compound_doc[i], extended_compound_doc[i+1])
+                #with extended_compound_doc.retokenize() as retokenizer:
+                #    retokenizer.merge(extended_compound_doc[i:i+2])
+                #print(extended_compound_doc[i], extended_compound_doc[i+1])
+            # while (properties[0] != spacy_doc[i].text):
+            #    with spacy_doc.retokenize() as retokenizer:
+            #        retokenizer.merge(spacy_doc[i:i+2])
+            i += 1
+    #print(extended_compound_doc)
+    return None
+
 
 # Useful functions
 
@@ -451,7 +483,7 @@ pprint.pprint(results,width=1)
 
 entity_grouping(corpus)#spacy_doc)
 
-#extend_entity_span(spacy_doc)
+extend_entity_span(corpus,spacy_doc)
 
 # Reference code from class examples
 
